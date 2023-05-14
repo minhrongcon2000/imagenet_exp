@@ -23,7 +23,7 @@ class ImageNet1k(Dataset):
             index = index.tolist()
         
         img_dir = self.label_df.loc[index, "image_dir"]
-        labels = self.label_df.loc[index, "label"].astype(np.int32)
+        labels = self.label_df.loc[index, "label"]
         
         img = cv2.imread(img_dir)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
