@@ -14,8 +14,8 @@ dataset = ImageNet1k(label_files=args["train_dir"])
 print(len(dataset))
 
 dataset = ImageNet1k(label_files=args["train_dir"], transform=transforms.Compose([
-    transforms.RandomCrop(size=224),
     transforms.ToTensor(),
+    transforms.RandomCrop(size=224),
 ]))
 loader = DataLoader(dataset=dataset, batch_size=32)
 for batch in loader:
