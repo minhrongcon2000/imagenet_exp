@@ -18,15 +18,15 @@ class ImageNet1k(Dataset):
     def __len__(self) -> int:
         return len(self.label_df)
     
-    def __getitem__(self, index: Union[int, List[int], torch.Tensor]) -> Tuple[np.ndarray, np.ndarray]:
+    def __getitem__(self, index: Union[int, List[int], torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor]:
         if torch.is_tensor(index):
             index = index.tolist()
         
         img_dir = self.label_df.loc[index, "image_dir"]
-        labels = self.label_df.loc[index, "label"]
+        labels = self.label_df.loc[index, "label"].astype(np.int32)
         
         img = cv2.imread(img_dir)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
         
         if self.transform:
             img = self.transform(img)
