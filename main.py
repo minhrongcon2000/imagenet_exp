@@ -32,8 +32,8 @@ train_transform = Compose([
 ])
 
 test_transform = Compose([
-    Resize(224),
     ToTensor(),
+    Resize(224),
     Normalize([0.49139968, 0.48215841, 0.44653091],
               [1., 1., 1.])
 ])
