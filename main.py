@@ -52,6 +52,8 @@ val_loader = DataLoader(val_dataset,
 model = ResNet50(num_classes=1000)
 
 pl_trainer = Trainer(accelerator="gpu",
+                     devices=2,
+                     strategy="ddp",
                      max_epochs=100,
                      enable_progress_bar=False,
                      callbacks=[
