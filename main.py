@@ -5,6 +5,7 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
+from torchvision import disable_beta_transforms_warning
 from torchvision.transforms import (Compose, Normalize, RandomCrop,
                                     RandomHorizontalFlip, Resize, ToTensor)
 from torchvision.transforms.v2 import RandomResize
@@ -21,6 +22,7 @@ args = vars(parser.parse_args())
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
 
 seed_everything(42)
+disable_beta_transforms_warning()
 
 train_transform = Compose([
     ToTensor(),
@@ -42,11 +44,11 @@ train_dataset = ImageNet1k(label_files=args["train_dir"], transform=train_transf
 val_dataset = ImageNet1k(label_files=args["val_dir"], transform=test_transform)
 
 train_loader = DataLoader(train_dataset,
-                          batch_size=128,
+                          batch_size=64,
                           shuffle=True,
                           num_workers=4)
 val_loader = DataLoader(val_dataset,
-                        batch_size=256,
+                        batch_size=64,
                         shuffle=False,
                         num_workers=4)
 
