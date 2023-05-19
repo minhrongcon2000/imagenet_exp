@@ -23,10 +23,10 @@ os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
 seed_everything(42)
 
 train_transform = Compose([
+    ToTensor(),
     RandomResize(min_size=256, max_size=480),
     RandomHorizontalFlip(),
     RandomCrop(224),
-    ToTensor(),
     Normalize([0.49139968, 0.48215841, 0.44653091],
               [1., 1., 1.]),  
 ])
