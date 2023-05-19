@@ -24,7 +24,7 @@ seed_everything(42)
 
 train_transform = Compose([
     ToTensor(),
-    RandomResize(min_size=256, max_size=480),
+    RandomResize(min_size=256, max_size=480, antialias=False),
     RandomHorizontalFlip(),
     RandomCrop(224),
     Normalize([0.49139968, 0.48215841, 0.44653091],
@@ -42,7 +42,7 @@ train_dataset = ImageNet1k(label_files=args["train_dir"], transform=train_transf
 val_dataset = ImageNet1k(label_files=args["val_dir"], transform=test_transform)
 
 train_loader = DataLoader(train_dataset,
-                          batch_size=256,
+                          batch_size=128,
                           shuffle=True,
                           num_workers=4)
 val_loader = DataLoader(val_dataset,
