@@ -6,7 +6,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from torchvision.transforms import (Compose, Normalize, RandomCrop,
-                                    RandomHorizontalFlip, ToTensor)
+                                    RandomHorizontalFlip, Resize, ToTensor)
 from torchvision.transforms.v2 import RandomResize
 
 from datasets.imagenet import ImageNet1k
@@ -32,6 +32,7 @@ train_transform = Compose([
 ])
 
 test_transform = Compose([
+    Resize(224),
     ToTensor(),
     Normalize([0.49139968, 0.48215841, 0.44653091],
               [1., 1., 1.])
