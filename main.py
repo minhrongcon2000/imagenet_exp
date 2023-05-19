@@ -52,18 +52,26 @@ val_loader = DataLoader(val_dataset,
 
 model = ResNet50(num_classes=1000)
 
-pl_trainer = Trainer(accelerator="gpu",
-                     devices=2,
-                     strategy="ddp",
-                     max_epochs=100,
-                     enable_progress_bar=False,
-                     callbacks=[
-                         ModelCheckpoint("chkpt",
-                                         monitor=ResNet50.VAL_TOP1_ACC_KEY,
-                                         mode="max"),
-                     ],
-                     logger=WandbLogger(project="ImageNet1k",
-                                        name="ImageNet1k_ResNet50"))
-pl_trainer.fit(model=model,
-               train_dataloaders=train_loader,
-               val_dataloaders=val_loader)
+for batch in train_loader:
+    print(batch[0].shape)
+    break
+
+for batch in val_loader:
+    print(batch[0].shape)
+    break
+
+# pl_trainer = Trainer(accelerator="gpu",
+#                      devices=2,
+#                      strategy="ddp",
+#                      max_epochs=100,
+#                      enable_progress_bar=False,
+#                      callbacks=[
+#                          ModelCheckpoint("chkpt",
+#                                          monitor=ResNet50.VAL_TOP1_ACC_KEY,
+#                                          mode="max"),
+#                      ],
+#                      logger=WandbLogger(project="ImageNet1k",
+#                                         name="ImageNet1k_ResNet50"))
+# pl_trainer.fit(model=model,
+#                train_dataloaders=train_loader,
+#                val_dataloaders=val_loader)
