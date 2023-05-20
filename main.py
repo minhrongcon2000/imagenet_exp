@@ -5,7 +5,6 @@ from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
-from torchvision import disable_beta_transforms_warning
 from torchvision.transforms import (CenterCrop, Compose, Normalize,
                                     RandomHorizontalFlip, RandomResizedCrop, Resize, ToTensor)
 
@@ -23,7 +22,6 @@ args = vars(parser.parse_args())
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
 
 seed_everything(42)
-disable_beta_transforms_warning()
 
 train_transform = Compose([
     ToTensor(),
