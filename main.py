@@ -27,7 +27,7 @@ disable_beta_transforms_warning()
 
 train_transform = Compose([
     ToTensor(),
-    RandomResizedCrop(224),
+    RandomResizedCrop(224, antialias=True),
     RandomHorizontalFlip(),
     Normalize([0.49139968, 0.48215841, 0.44653091],
               [0.24703223, 0.24348513, 0.26158784]),
@@ -35,7 +35,7 @@ train_transform = Compose([
 
 test_transform = Compose([
     ToTensor(),
-    Resize(size=256),
+    Resize(size=256, antialias=True),
     CenterCrop(224),
     Normalize([0.49139968, 0.48215841, 0.44653091],
               [0.24703223, 0.24348513, 0.26158784]),
@@ -47,11 +47,11 @@ val_dataset = ImageNet1k(label_files=args["val_dir"], transform=test_transform)
 train_loader = DataLoader(train_dataset,
                           batch_size=64,
                           shuffle=True,
-                          num_workers=4)
+                          num_workers=2)
 val_loader = DataLoader(val_dataset,
                         batch_size=64,
                         shuffle=False,
-                        num_workers=4)
+                        num_workers=2)
 
 model = ResNet50(num_classes=1000)
 
