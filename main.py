@@ -6,9 +6,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from torchvision import disable_beta_transforms_warning
-from torchvision.transforms import (Compose, Normalize, RandomCrop,
-                                    RandomHorizontalFlip, Resize, ToTensor)
-from torchvision.transforms.v2 import RandomResize
+from torchvision.transforms import (CenterCrop, Compose, Normalize,
+                                    RandomHorizontalFlip, RandomResizedCrop, Resize, ToTensor)
 
 from datasets.imagenet import ImageNet1k
 from models import ResNet50
@@ -17,6 +16,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--train_dir", type=str, required=True)
 parser.add_argument("--val_dir", type=str, required=True)
 parser.add_argument("--wandb_api_key", type=str, required=True)
+parser.add_argument("--batch_size", type=int, default=256)
+parser.add_argument("--num_gpu", type=int, default=2)
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -26,18 +27,18 @@ disable_beta_transforms_warning()
 
 train_transform = Compose([
     ToTensor(),
-    RandomResize(min_size=256, max_size=480, antialias=False),
+    RandomResizedCrop(224),
     RandomHorizontalFlip(),
-    RandomCrop(224),
     Normalize([0.49139968, 0.48215841, 0.44653091],
-              [1., 1., 1.]),  
+              [0.24703223, 0.24348513, 0.26158784]),
 ])
 
 test_transform = Compose([
     ToTensor(),
-    Resize(size=(224, 224)),
+    Resize(size=256),
+    CenterCrop(224),
     Normalize([0.49139968, 0.48215841, 0.44653091],
-              [1., 1., 1.])
+              [0.24703223, 0.24348513, 0.26158784]),
 ])
 
 train_dataset = ImageNet1k(label_files=args["train_dir"], transform=train_transform)
@@ -55,8 +56,8 @@ val_loader = DataLoader(val_dataset,
 model = ResNet50(num_classes=1000)
 
 pl_trainer = Trainer(accelerator="gpu",
-                     devices=2,
-                     strategy="ddp",
+                     devices=args.get("num_gpu"),
+                     strategy="ddp" if args.get("num_gpu") > 1 else "auto",
                      max_epochs=100,
                      enable_progress_bar=False,
                      callbacks=[
