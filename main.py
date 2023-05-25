@@ -70,7 +70,7 @@ pl_trainer = Trainer(accelerator="gpu",
                      callbacks=[
                          ModelCheckpoint("chkpt",
                                          save_last=True,
-                                         every_n_train_steps=10),
+                                         every_n_train_steps=50),
                          LearningRateMonitor(),
                      ],
                      logger=WandbLogger(project="ImageNet1k",
