@@ -84,7 +84,7 @@ class ResNet50(pl.LightningModule):
                                                                           factor=0.1,
                                                                           mode="min")
         return dict(optimizer=optimizer,
-                    scheduler=[multistep_lr_scheduler, plateau_lr_scheduler],
+                    lr_schedulers=[multistep_lr_scheduler, plateau_lr_scheduler],
                     monitor=ResNet50.TRAIN_LOSS_KEY)
 
     def on_train_epoch_end(self) -> None:
