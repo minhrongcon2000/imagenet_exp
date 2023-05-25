@@ -1,6 +1,7 @@
 import argparse
 import os
 
+import wandb
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.loggers import WandbLogger
@@ -17,6 +18,7 @@ parser.add_argument("--val_dir", type=str, required=True)
 parser.add_argument("--wandb_api_key", type=str, required=True)
 parser.add_argument("--batch_size", type=int, default=256)
 parser.add_argument("--num_gpu", type=int, default=2)
+parser.add_argument("--resume_artifact", type=str)
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -51,7 +53,14 @@ val_loader = DataLoader(val_dataset,
                         shuffle=False,
                         num_workers=2)
 
-model = ResNet50(num_classes=1000)
+if not args.get("resume_artifact"):
+    model = ResNet50(num_classes=1000)
+else:
+    run = wandb.init(project="ImageNet1k", name="ImageNet1k_ResNet50")
+    artifact = run.use_artifact(args.get("resume_artifact"), type='model')
+    artifact_dir = artifact.download()
+
+    model = ResNet50.load_from_checkpoint(os.path.join(artifact_dir, "model.chkpt"))
 
 pl_trainer = Trainer(accelerator="gpu",
                      devices=args.get("num_gpu"),

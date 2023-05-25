@@ -3,3 +3,4 @@ torchvision
 pandas
 opencv-contrib-python
 lightning
+wandb
