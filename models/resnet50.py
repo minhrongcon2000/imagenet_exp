@@ -35,6 +35,7 @@ class ResNet50(pl.LightningModule):
         self.val_top5_acc = Accuracy(num_classes=self.num_classes,
                                      top_k=5,
                                      task="multiclass")
+        self.automatic_optimization = False
 
         self.train_loss = None
         self.val_loss = None
@@ -45,8 +46,19 @@ class ResNet50(pl.LightningModule):
     def training_step(self, batch, batch_idx) -> torch.Tensor:
         imgs, labels = batch
         preds = self.forward(imgs)
-
+        
+        # backprop
+        opt: torch.optim.Optimizer = self.optimizers()
+        opt.zero_grad()
         loss = F.cross_entropy(preds, labels)
+        self.manual_backward(loss)
+        opt.step()
+        
+        # Degrade lr
+        sched1, sched2 = self.lr_schedulers()
+        sched1.step()
+        sched2.step()
+        
         self.train_loss = loss.item()
 
         self.train_top1_acc(preds, labels)
