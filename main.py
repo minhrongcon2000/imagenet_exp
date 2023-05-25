@@ -64,7 +64,8 @@ pl_trainer = Trainer(accelerator="gpu",
                                          mode="max"),
                      ],
                      logger=WandbLogger(project="ImageNet1k",
-                                        name="ImageNet1k_ResNet50"))
+                                        name="ImageNet1k_ResNet50",
+                                        log_model="all"))
 pl_trainer.fit(model=model,
                train_dataloaders=train_loader,
                val_dataloaders=val_loader)

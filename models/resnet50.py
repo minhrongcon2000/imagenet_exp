@@ -74,11 +74,18 @@ class ResNet50(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(self.parameters(), 
-                                    lr=0.01,
+                                    lr=0.1,
                                     weight_decay=1e-4, 
                                     momentum=0.9)
-        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 0.1 ** (epoch // 30))
-        return [optimizer], [lr_scheduler]
+        multistep_lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, 
+                                                                      milestones=[int(6e4)], 
+                                                                      gamma=0.1)
+        plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                                          factor=0.1,
+                                                                          mode="min")
+        return dict(optimizer=optimizer,
+                    lr_scheduler=[multistep_lr_scheduler, plateau_lr_scheduler],
+                    monitor=ResNet50.TRAIN_LOSS_KEY)
 
     def on_train_epoch_end(self) -> None:
         print(f"Epoch {self.current_epoch}, " + f"Train loss: {self.train_loss}, " +
