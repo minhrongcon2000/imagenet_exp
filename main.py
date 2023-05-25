@@ -2,7 +2,7 @@ import argparse
 import os
 
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
 from torchvision.transforms import (CenterCrop, Compose, Normalize,
@@ -62,6 +62,7 @@ pl_trainer = Trainer(accelerator="gpu",
                          ModelCheckpoint("chkpt",
                                          save_last=True,
                                          every_n_train_steps=10),
+                         LearningRateMonitor(),
                      ],
                      logger=WandbLogger(project="ImageNet1k",
                                         name="ImageNet1k_ResNet50",

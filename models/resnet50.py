@@ -35,7 +35,6 @@ class ResNet50(pl.LightningModule):
         self.val_top5_acc = Accuracy(num_classes=self.num_classes,
                                      top_k=5,
                                      task="multiclass")
-        self.automatic_optimization = False
 
         self.train_loss = None
         self.val_loss = None
@@ -47,17 +46,7 @@ class ResNet50(pl.LightningModule):
         imgs, labels = batch
         preds = self.forward(imgs)
         
-        # backprop
-        opt: torch.optim.Optimizer = self.optimizers()
-        opt.zero_grad()
         loss = F.cross_entropy(preds, labels)
-        self.manual_backward(loss)
-        opt.step()
-        
-        # Degrade lr
-        sched1, sched2 = self.lr_schedulers()
-        sched1.step()
-        sched2.step()
         
         self.train_loss = loss.item()
 
@@ -95,13 +84,11 @@ class ResNet50(pl.LightningModule):
         plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
                                                                           factor=0.1,
                                                                           mode="min")
-        return [
-            dict(optimizer=optimizer,
-                 lr_scheduler=multistep_lr_scheduler),
-            dict(optimizer=optimizer,
-                 lr_scheduler=dict(scheduler=plateau_lr_scheduler,
-                                   monitor=ResNet50.TRAIN_LOSS_KEY))
-        ]
+        return [optimizer], [dict(scheduler=multistep_lr_scheduler,
+                                  name="milestone_sched"),
+                             dict(scheduler=plateau_lr_scheduler, 
+                                  monitor=self.TRAIN_LOSS_KEY,
+                                  name="plateau_sched")]
 
     def on_train_epoch_end(self) -> None:
         print(f"Epoch {self.current_epoch}, " + f"Train loss: {self.train_loss}, " +
