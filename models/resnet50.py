@@ -83,9 +83,13 @@ class ResNet50(pl.LightningModule):
         plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
                                                                           factor=0.1,
                                                                           mode="min")
-        return dict(optimizer=optimizer,
-                    lr_schedulers=[multistep_lr_scheduler, plateau_lr_scheduler],
-                    monitor=ResNet50.TRAIN_LOSS_KEY)
+        return [
+            dict(optimizer=optimizer,
+                 lr_scheduler=multistep_lr_scheduler),
+            dict(optimizer=optimizer,
+                 lr_scheduler=dict(scheduler=plateau_lr_scheduler,
+                                   monitor=ResNet50.TRAIN_LOSS_KEY))
+        ]
 
     def on_train_epoch_end(self) -> None:
         print(f"Epoch {self.current_epoch}, " + f"Train loss: {self.train_loss}, " +
