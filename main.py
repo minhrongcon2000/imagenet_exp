@@ -60,7 +60,7 @@ else:
     artifact = run.use_artifact(args.get("resume_artifact"), type='model')
     artifact_dir = artifact.download()
 
-    model = ResNet50.load_from_checkpoint(os.path.join(artifact_dir, "model.ckpt"))
+    model = ResNet50.load_from_checkpoint(os.path.join(artifact_dir, "model.ckpt"), num_classes=1000)
 
 pl_trainer = Trainer(accelerator="gpu",
                      devices=args.get("num_gpu"),
