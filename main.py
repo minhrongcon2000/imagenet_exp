@@ -64,10 +64,7 @@ val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=2
 model = ResNet50(num_classes=1000)
 
 if args.get("resume_artifact"):
-    run = wandb.init(project="ImageNet1k", name="ImageNet1k_ResNet50")
-    artifact = run.use_artifact(args.get("resume_artifact"), type="model")
-    artifact_dir = artifact.download()
-    wandb.finish()
+    artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
 
 pl_trainer = Trainer(
     accelerator="gpu",
