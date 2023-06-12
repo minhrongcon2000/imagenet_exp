@@ -66,6 +66,8 @@ model = ResNet50(num_classes=1000)
 
 if args.get("resume_artifact"):
     artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
+else:
+    artifact_dir = None
 
 pl_trainer = Trainer(
     accelerator=args.get("device"),
@@ -87,6 +89,6 @@ pl_trainer.fit(
     train_dataloaders=train_loader,
     val_dataloaders=val_loader,
     ckpt_path=os.path.join(artifact_dir, "model.ckpt")
-    if os.path.exists(os.path.join(artifact_dir, "model.ckpt"))
+    if artifact_dir is not None
     else None,
 )
