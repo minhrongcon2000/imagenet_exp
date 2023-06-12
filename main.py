@@ -70,7 +70,7 @@ if args.get("resume_artifact"):
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_gpu"),
-    strategy="ddp" if args.get("num_gpu") > 1 else "auto",
+    strategy="auto",
     max_epochs=100,
     enable_progress_bar=False,
     callbacks=[
