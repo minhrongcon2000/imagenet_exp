@@ -26,6 +26,7 @@ parser.add_argument("--wandb_api_key", type=str, required=True)
 parser.add_argument("--batch_size", type=int, default=256)
 parser.add_argument("--num_gpu", type=int, default=2)
 parser.add_argument("--resume_artifact", type=str)
+parser.add_argument("--device", type=str, default="gpu")
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -67,7 +68,7 @@ if args.get("resume_artifact"):
     artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
 
 pl_trainer = Trainer(
-    accelerator="gpu",
+    accelerator=args.get("device"),
     devices=args.get("num_gpu"),
     strategy="ddp" if args.get("num_gpu") > 1 else "auto",
     max_epochs=100,
