@@ -15,8 +15,8 @@ from torchvision.transforms import (
     ToTensor,
 )
 
-import wandb
-from datasets.imagenet import ImageNet1k
+# from datasets.imagenet import ImageNet1k
+from torchvision.datasets import ImageFolder
 from models import ResNet50
 
 parser = argparse.ArgumentParser()
@@ -24,7 +24,7 @@ parser.add_argument("--train_dir", type=str, required=True)
 parser.add_argument("--val_dir", type=str, required=True)
 parser.add_argument("--wandb_api_key", type=str, required=True)
 parser.add_argument("--batch_size", type=int, default=256)
-parser.add_argument("--num_gpu", type=int, default=2)
+parser.add_argument("--num_devices", type=int, default=2)
 parser.add_argument("--resume_artifact", type=str)
 parser.add_argument("--device", type=str, default="gpu")
 args = vars(parser.parse_args())
@@ -55,8 +55,8 @@ test_transform = Compose(
     ]
 )
 
-train_dataset = ImageNet1k(label_files=args["train_dir"], transform=train_transform)
-val_dataset = ImageNet1k(label_files=args["val_dir"], transform=test_transform)
+train_dataset = ImageFolder(root=args["train_dir"], transform=train_transform)
+val_dataset = ImageFolder(root=args["val_dir"], transform=test_transform)
 
 train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
 val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=2)
@@ -71,7 +71,7 @@ else:
 
 pl_trainer = Trainer(
     accelerator=args.get("device"),
-    devices=args.get("num_gpu"),
+    devices=args.get("num_devices"),
     strategy="auto",
     max_epochs=100,
     enable_progress_bar=False,
