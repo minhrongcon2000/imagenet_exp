@@ -36,7 +36,7 @@ seed_everything(42)
 train_transform = Compose(
     [
         ToTensor(),
-        RandomResizedCrop(224, antialias=True),
+        RandomResizedCrop(224),
         RandomHorizontalFlip(),
         Normalize(
             [0.49139968, 0.48215841, 0.44653091], [0.24703223, 0.24348513, 0.26158784]
@@ -47,7 +47,7 @@ train_transform = Compose(
 test_transform = Compose(
     [
         ToTensor(),
-        Resize(size=256, antialias=True),
+        Resize(size=256),
         CenterCrop(224),
         Normalize(
             [0.49139968, 0.48215841, 0.44653091], [0.24703223, 0.24348513, 0.26158784]
