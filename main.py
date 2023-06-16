@@ -76,7 +76,13 @@ pl_trainer = Trainer(
     max_epochs=100,
     enable_progress_bar=False,
     callbacks=[
-        ModelCheckpoint("chkpt", save_last=True, save_top_k=5),
+        ModelCheckpoint(
+            "chkpt",
+            save_last=True,
+            save_top_k=5,
+            monitor=ResNet50.VAL_TOP1_ACC_KEY,
+            mode="max",
+        ),
         LearningRateMonitor(),
     ],
     logger=WandbLogger(
