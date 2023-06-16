@@ -82,10 +82,8 @@ class ResNet50(pl.LightningModule):
         # plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
         #                                                                   factor=0.1,
         #                                                                   mode="min")
-        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
-            optimizer=optimizer,
-            lr_lambda=lambda step: 0.1 ** (step // int(1e3)),
-            last_epoch=int(6e4),
+        lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(
+            optimizer=optimizer, gamma=0.1, last_epoch=int(6e4)
         )
         return [optimizer], [lr_scheduler]
 
