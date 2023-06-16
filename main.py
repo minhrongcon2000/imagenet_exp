@@ -25,7 +25,6 @@ parser.add_argument("--val_dir", type=str, required=True)
 parser.add_argument("--wandb_api_key", type=str, required=True)
 parser.add_argument("--batch_size", type=int, default=256)
 parser.add_argument("--num_devices", type=int, default=2)
-parser.add_argument("--resume_artifact", type=str)
 parser.add_argument("--device", type=str, default="gpu")
 args = vars(parser.parse_args())
 
@@ -64,13 +63,6 @@ val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=1
 
 model = ResNet50(num_classes=1000)
 
-if args.get("resume_artifact"):
-    artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
-else:
-    artifact_dir = None
-
-print(artifact_dir)
-
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
@@ -88,7 +80,7 @@ pl_trainer = Trainer(
         LearningRateMonitor(),
     ],
     logger=WandbLogger(
-        project="ImageNet1k", name="ImageNet1k_ResNet50_1", log_model=True
+        project="ImageNet1k", name="ImageNet1k_ResNet50", log_model=True
     ),
 )
 
