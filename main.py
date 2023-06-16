@@ -77,7 +77,7 @@ else:
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
-    strategy="auto",
+    strategy="ddp",
     max_epochs=100,
     enable_progress_bar=False,
     callbacks=[
