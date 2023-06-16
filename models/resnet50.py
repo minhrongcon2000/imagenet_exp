@@ -86,7 +86,6 @@ class ResNet50(pl.LightningModule):
             optimizer=optimizer,
             lr_lambda=lambda step: 0.1 ** (step // int(1e3)),
             last_epoch=int(6e4),
-            initial_lr=0.1,
         )
         return [optimizer], [lr_scheduler]
 
