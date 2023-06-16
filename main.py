@@ -27,6 +27,7 @@ parser.add_argument("--batch_size", type=int, default=256)
 parser.add_argument("--num_devices", type=int, default=2)
 parser.add_argument("--device", type=str, default="gpu")
 parser.add_argument("--num_workers", type=int, default=2)
+parser.add_argument("--resume_artifact", type=str)
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -68,6 +69,11 @@ val_loader = DataLoader(
 
 model = ResNet50(num_classes=1000)
 
+if args.get("resume_artifact"):
+    artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
+else:
+    artifact_dir = None
+
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
@@ -93,4 +99,7 @@ pl_trainer.fit(
     model=model,
     train_dataloaders=train_loader,
     val_dataloaders=val_loader,
+    ckpt_path=os.path.join(artifact_dir, "model.ckpt")
+    if artifact_dir is not None
+    else None,
 )
