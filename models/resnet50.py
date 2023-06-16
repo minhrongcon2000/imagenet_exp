@@ -15,26 +15,25 @@ class ResNet50(pl.LightningModule):
     VAL_TOP1_ACC_KEY = "val_top1_acc"
     VAL_TOP5_ACC_KEY = "val_top5_acc"
 
-    def __init__(self,
-                 num_classes: int) -> None:
+    def __init__(self, num_classes: int) -> None:
         super().__init__()
         self.num_classes = num_classes
 
         self.resnet_model = resnet50()
         self.resnet_model.fc = nn.Linear(2048, self.num_classes)
 
-        self.train_top1_acc = Accuracy(num_classes=self.num_classes,
-                                       top_k=1,
-                                       task="multiclass")
-        self.train_top5_acc = Accuracy(num_classes=self.num_classes,
-                                       top_k=5,
-                                       task="multiclass")
-        self.val_top1_acc = Accuracy(num_classes=self.num_classes,
-                                     top_k=1,
-                                     task="multiclass")
-        self.val_top5_acc = Accuracy(num_classes=self.num_classes,
-                                     top_k=5,
-                                     task="multiclass")
+        self.train_top1_acc = Accuracy(
+            num_classes=self.num_classes, top_k=1, task="multiclass"
+        )
+        self.train_top5_acc = Accuracy(
+            num_classes=self.num_classes, top_k=5, task="multiclass"
+        )
+        self.val_top1_acc = Accuracy(
+            num_classes=self.num_classes, top_k=1, task="multiclass"
+        )
+        self.val_top5_acc = Accuracy(
+            num_classes=self.num_classes, top_k=5, task="multiclass"
+        )
 
         self.train_loss = None
         self.val_loss = None
@@ -45,9 +44,9 @@ class ResNet50(pl.LightningModule):
     def training_step(self, batch, batch_idx) -> torch.Tensor:
         imgs, labels = batch
         preds = self.forward(imgs)
-        
+
         loss = F.cross_entropy(preds, labels)
-        
+
         self.train_loss = loss.item()
 
         self.train_top1_acc(preds, labels)
@@ -74,22 +73,26 @@ class ResNet50(pl.LightningModule):
         self.log(self.VAL_TOP5_ACC_KEY, self.val_top5_acc)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.SGD(self.parameters(), 
-                                    lr=0.1,
-                                    weight_decay=1e-4, 
-                                    momentum=0.9)
-        multistep_lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, 
-                                                                      milestones=[int(6e4)], 
-                                                                      gamma=0.1)
-        plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
-                                                                          factor=0.1,
-                                                                          mode="min")
-        return [optimizer], [dict(scheduler=multistep_lr_scheduler,
-                                  name="milestone_sched"),
-                             dict(scheduler=plateau_lr_scheduler, 
-                                  monitor=self.TRAIN_LOSS_KEY,
-                                  name="plateau_sched")]
+        optimizer = torch.optim.SGD(
+            self.parameters(), lr=0.1, weight_decay=1e-4, momentum=0.9
+        )
+        # multistep_lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+        #                                                               milestones=[int(6e4)],
+        #                                                               gamma=0.1)
+        # plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+        #                                                                   factor=0.1,
+        #                                                                   mode="min")
+        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
+            optimizer=optimizer,
+            lr_lambda=lambda step: 0.1 ** (step // int(1e3)),
+            last_epoch=int(6e4),
+        )
+        return [optimizer], [lr_scheduler]
 
     def on_train_epoch_end(self) -> None:
-        print(f"Epoch {self.current_epoch}, " + f"Train loss: {self.train_loss}, " +
-              f"Train top 1 acc: {self.train_top1_acc.compute()}, " + f"Train top 5 acc: {self.train_top5_acc.compute()}")
+        print(
+            f"Epoch {self.current_epoch}, "
+            + f"Train loss: {self.train_loss}, "
+            + f"Train top 1 acc: {self.train_top1_acc.compute()}, "
+            + f"Train top 5 acc: {self.train_top5_acc.compute()}"
+        )
