@@ -26,6 +26,7 @@ parser.add_argument("--wandb_api_key", type=str, required=True)
 parser.add_argument("--batch_size", type=int, default=256)
 parser.add_argument("--num_devices", type=int, default=2)
 parser.add_argument("--device", type=str, default="gpu")
+parser.add_argument("--num_workers", type=int, default=2)
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -57,8 +58,12 @@ test_transform = Compose(
 train_dataset = ImageFolder(root=args["train_dir"], transform=train_transform)
 val_dataset = ImageFolder(root=args["val_dir"], transform=test_transform)
 
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=14)
-val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=14)
+train_loader = DataLoader(
+    train_dataset, batch_size=64, shuffle=True, num_workers=args.get("num_workers")
+)
+val_loader = DataLoader(
+    val_dataset, batch_size=64, shuffle=False, num_workers=args.get("num_workers")
+)
 
 
 model = ResNet50(num_classes=1000)
