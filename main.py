@@ -96,7 +96,4 @@ pl_trainer.fit(
     model=model,
     train_dataloaders=train_loader,
     val_dataloaders=val_loader,
-    ckpt_path=os.path.join(artifact_dir, "model.ckpt")
-    if artifact_dir is not None
-    else None,
 )
