@@ -88,7 +88,7 @@ pl_trainer = Trainer(
         LearningRateMonitor(),
     ],
     logger=WandbLogger(
-        project="ImageNet1k", name="ImageNet1k_ResNet50", log_model=True
+        project="ImageNet1k", name="ImageNet1k_ResNet50_1", log_model=True
     ),
 )
 
