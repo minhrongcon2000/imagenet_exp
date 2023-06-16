@@ -69,6 +69,8 @@ if args.get("resume_artifact"):
 else:
     artifact_dir = None
 
+print(artifact_dir)
+
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
