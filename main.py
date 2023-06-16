@@ -58,8 +58,8 @@ test_transform = Compose(
 train_dataset = ImageFolder(root=args["train_dir"], transform=train_transform)
 val_dataset = ImageFolder(root=args["val_dir"], transform=test_transform)
 
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
-val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=2)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=14)
+val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=14)
 
 
 model = ResNet50(num_classes=1000)
