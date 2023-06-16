@@ -76,11 +76,11 @@ pl_trainer = Trainer(
     max_epochs=100,
     enable_progress_bar=False,
     callbacks=[
-        ModelCheckpoint("chkpt", save_last=True, every_n_train_steps=50),
+        ModelCheckpoint("chkpt", save_last=True, save_top_k=5),
         LearningRateMonitor(),
     ],
     logger=WandbLogger(
-        project="ImageNet1k", name="ImageNet1k_ResNet50", log_model="all"
+        project="ImageNet1k", name="ImageNet1k_ResNet50", log_model=True
     ),
 )
 
