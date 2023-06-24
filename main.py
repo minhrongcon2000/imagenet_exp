@@ -1,6 +1,8 @@
 import argparse
 import os
 
+import cv2
+import numpy as np
 import torch
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
@@ -47,11 +49,18 @@ os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
 
 seed_everything(42)
 
+
+def image_loader(img_path):
+    img = cv2.imread(img_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
+    return img
+
+
 train_transform = Compose(
     [
+        ToTensor(),
         RandomResizedCrop(224),
         RandomHorizontalFlip(),
-        ToTensor(),
         Normalize(
             mean=[0.49139968, 0.48215841, 0.44653091],
             std=[0.24703223, 0.24348513, 0.26158784],
@@ -61,9 +70,9 @@ train_transform = Compose(
 
 test_transform = Compose(
     [
+        ToTensor(),
         Resize(size=256),
         CenterCrop(224),
-        ToTensor(),
         Normalize(
             mean=[0.49139968, 0.48215841, 0.44653091],
             std=[0.24703223, 0.24348513, 0.26158784],
@@ -71,8 +80,16 @@ test_transform = Compose(
     ]
 )
 
-train_dataset = ImageFolder(root=args.get("train_dir"), transform=train_transform)
-val_dataset = ImageFolder(root=args.get("val_dir"), transform=test_transform)
+train_dataset = ImageFolder(
+    root=args.get("train_dir"),
+    transform=train_transform,
+    loader=image_loader,
+)
+val_dataset = ImageFolder(
+    root=args.get("val_dir"),
+    transform=test_transform,
+    loader=image_loader,
+)
 
 train_loader = DataLoader(
     train_dataset,
@@ -133,5 +150,6 @@ try:
 except Exception as e:
     logger._experiment.alert(
         title="Run crashes",
-        text=str(e),
+        text=str(e.with_traceback()),
     )
+    raise (e)
