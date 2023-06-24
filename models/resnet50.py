@@ -15,9 +15,18 @@ class ResNet50(pl.LightningModule):
     VAL_TOP1_ACC_KEY = "val_top1_acc"
     VAL_TOP5_ACC_KEY = "val_top5_acc"
 
-    def __init__(self, num_classes: int) -> None:
+    def __init__(
+        self,
+        num_classes: int,
+        lr: float = 0.1,
+        weight_decay: float = 1e-4,
+        momentum: float = 0.9,
+    ) -> None:
         super().__init__()
         self.num_classes = num_classes
+        self.lr = lr
+        self.weight_decay = weight_decay
+        self.momentum = momentum
 
         self.resnet_model = resnet50()
         self.resnet_model.fc = nn.Linear(2048, self.num_classes)
@@ -74,17 +83,15 @@ class ResNet50(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.SGD(
-            self.parameters(), lr=0.1, weight_decay=1e-4, momentum=0.9
+            self.parameters(),
+            lr=self.lr,
+            weight_decay=self.weight_decay,
+            momentum=self.momentum,
         )
-        # multistep_lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-        #                                                               milestones=[int(6e4)],
-        #                                                               gamma=0.1)
-        # plateau_lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
-        #                                                                   factor=0.1,
-        #                                                                   mode="min")
-        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer=optimizer,
-            lr_lambda=lambda step: 0.1 ** (step // int(1e3)),
+            step_size=30,
+            gamma=0.1,
         )
         return [optimizer], [lr_scheduler]
 

@@ -20,14 +20,23 @@ from torchvision.datasets import ImageFolder
 from models import ResNet50
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--train_dir", type=str, required=True)
-parser.add_argument("--val_dir", type=str, required=True)
-parser.add_argument("--wandb_api_key", type=str, required=True)
-parser.add_argument("--batch_size", type=int, default=256)
-parser.add_argument("--num_devices", type=int, default=2)
-parser.add_argument("--device", type=str, default="gpu")
-parser.add_argument("--num_workers", type=int, default=2)
-parser.add_argument("--resume_artifact", type=str)
+data_group = parser.add_argument_group("data config")
+data_group.add_argument("--train_dir", type=str, required=True)
+data_group.add_argument("--val_dir", type=str, required=True)
+auth_group = parser.add_argument_group("wandb authentication")
+auth_group.add_argument("--wandb_api_key", type=str, required=True)
+trainer_group = parser.add_argument_group("trainer config")
+trainer_group.add_argument("--batch_size", type=int, default=256)
+trainer_group.add_argument("--num_devices", type=int, default=2)
+trainer_group.add_argument("--device", type=str, default="gpu")
+trainer_group.add_argument("--num_workers", type=int, default=4)
+trainer_group.add_argument("--resume_artifact", type=str)
+trainer_group.add_argument("--num_epochs", type=int, default=90)
+model_group = parser.add_argument_group("model config")
+model_group.add_argument("--lr", type=float, default=0.1)
+model_group.add_argument("--num_classes", type=int, default=1000)
+model_group.add_argument("--weight_decay", type=float, default=1e-4)
+model_group.add_argument("--momentum", type=float, default=0.9)
 args = vars(parser.parse_args())
 
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
@@ -36,38 +45,51 @@ seed_everything(42)
 
 train_transform = Compose(
     [
-        ToTensor(),
         RandomResizedCrop(224),
         RandomHorizontalFlip(),
+        ToTensor(),
         Normalize(
-            [0.49139968, 0.48215841, 0.44653091], [0.24703223, 0.24348513, 0.26158784]
+            mean=[0.49139968, 0.48215841, 0.44653091],
+            std=[0.24703223, 0.24348513, 0.26158784],
         ),
     ]
 )
 
 test_transform = Compose(
     [
-        ToTensor(),
         Resize(size=256),
         CenterCrop(224),
+        ToTensor(),
         Normalize(
-            [0.49139968, 0.48215841, 0.44653091], [0.24703223, 0.24348513, 0.26158784]
+            mean=[0.49139968, 0.48215841, 0.44653091],
+            std=[0.24703223, 0.24348513, 0.26158784],
         ),
     ]
 )
 
-train_dataset = ImageFolder(root=args["train_dir"], transform=train_transform)
-val_dataset = ImageFolder(root=args["val_dir"], transform=test_transform)
+train_dataset = ImageFolder(root=args.get("train_dir"), transform=train_transform)
+val_dataset = ImageFolder(root=args.get("val_dir"), transform=test_transform)
 
 train_loader = DataLoader(
-    train_dataset, batch_size=64, shuffle=True, num_workers=args.get("num_workers")
+    train_dataset,
+    batch_size=args.get("batch_size"),
+    shuffle=True,
+    num_workers=args.get("num_workers"),
 )
 val_loader = DataLoader(
-    val_dataset, batch_size=64, shuffle=False, num_workers=args.get("num_workers")
+    val_dataset,
+    batch_size=args.get("batch_size"),
+    shuffle=False,
+    num_workers=args.get("num_workers"),
 )
 
 
-model = ResNet50(num_classes=1000)
+model = ResNet50(
+    num_classes=args.get("num_classes"),
+    lr=args.get("lr"),
+    weight_decay=args.get("weight_decay"),
+    momentum=args.get("momentum"),
+)
 
 if args.get("resume_artifact"):
     artifact_dir = WandbLogger.download_artifact(args.get("resume_artifact"))
@@ -77,8 +99,7 @@ else:
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
-    strategy="ddp",
-    max_epochs=100,
+    max_epochs=args.get("num_epochs"),
     enable_progress_bar=False,
     callbacks=[
         ModelCheckpoint(
