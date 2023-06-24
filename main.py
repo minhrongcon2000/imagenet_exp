@@ -1,6 +1,7 @@
 import argparse
 import os
 
+import torch
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
@@ -18,6 +19,9 @@ from torchvision.transforms import (
 # from datasets.imagenet import ImageNet1k
 from torchvision.datasets import ImageFolder
 from models import ResNet50
+
+# https://github.com/pytorch/pytorch/issues/11201
+torch.multiprocessing.set_sharing_strategy("file_system")
 
 parser = argparse.ArgumentParser()
 data_group = parser.add_argument_group("data config")
@@ -96,6 +100,8 @@ if args.get("resume_artifact"):
 else:
     artifact_dir = None
 
+logger = WandbLogger(project="ImageNet1k", name="ImageNet1k_ResNet50", log_model=True)
+
 pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
@@ -111,16 +117,21 @@ pl_trainer = Trainer(
         ),
         LearningRateMonitor(),
     ],
-    logger=WandbLogger(
-        project="ImageNet1k", name="ImageNet1k_ResNet50", log_model=True
-    ),
+    logger=logger,
 )
 
-pl_trainer.fit(
-    model=model,
-    train_dataloaders=train_loader,
-    val_dataloaders=val_loader,
-    ckpt_path=os.path.join(artifact_dir, "model.ckpt")
-    if artifact_dir is not None
-    else None,
-)
+try:
+    pl_trainer.fit(
+        model=model,
+        train_dataloaders=train_loader,
+        val_dataloaders=val_loader,
+        ckpt_path=os.path.join(artifact_dir, "model.ckpt")
+        if artifact_dir is not None
+        else None,
+    )
+
+except Exception as e:
+    logger._experiment.alert(
+        title="Run crashes",
+        text=str(e),
+    )
