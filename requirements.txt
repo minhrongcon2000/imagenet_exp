@@ -3,4 +3,5 @@ torchvision
 pandas
 opencv-contrib-python
 lightning
-wandb
+wandb==0.15.0
+protobuf=3.20.*
