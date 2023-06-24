@@ -100,7 +100,6 @@ pl_trainer = Trainer(
     accelerator=args.get("device"),
     devices=args.get("num_devices"),
     max_epochs=args.get("num_epochs"),
-    strategy="ddp",
     enable_progress_bar=False,
     callbacks=[
         ModelCheckpoint(
