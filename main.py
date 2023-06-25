@@ -1,9 +1,6 @@
 import argparse
 import os
 
-import cv2
-import numpy as np
-import torch
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
@@ -22,8 +19,6 @@ from torchvision.transforms import (
 from torchvision.datasets import ImageFolder
 from models import ResNet50
 
-# https://github.com/pytorch/pytorch/issues/11201
-torch.multiprocessing.set_sharing_strategy("file_system")
 
 parser = argparse.ArgumentParser()
 data_group = parser.add_argument_group("data config")
@@ -48,12 +43,6 @@ args = vars(parser.parse_args())
 os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
 
 seed_everything(42)
-
-
-def image_loader(img_path):
-    img = cv2.imread(img_path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
-    return img
 
 
 train_transform = Compose(
@@ -83,12 +72,10 @@ test_transform = Compose(
 train_dataset = ImageFolder(
     root=args.get("train_dir"),
     transform=train_transform,
-    loader=image_loader,
 )
 val_dataset = ImageFolder(
     root=args.get("val_dir"),
     transform=test_transform,
-    loader=image_loader,
 )
 
 train_loader = DataLoader(
