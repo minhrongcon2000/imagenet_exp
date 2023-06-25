@@ -4,7 +4,7 @@ do
     case "${flag}" in
         t) train_dir=${OPTARG};;
         v) val_dir=${OPTARG};;
-        W) wandb_api_key=${OPTARG};;
+        w) wandb_api_key=${OPTARG};;
         n) num_devices=${OPTARG};;
     esac
 done
