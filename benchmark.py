@@ -18,8 +18,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--train_dir", type=str, required=True)
 args = vars(parser.parse_args())
 
-os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
-
 
 train_transform = Compose(
     [
