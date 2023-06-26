@@ -16,6 +16,8 @@ from torchvision.datasets import ImageFolder
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--train_dir", type=str, required=True)
+parser.add_argument("--num_workers", type=int, default=2)
+parser.add_argument("--batch_size", type=int, default=256)
 args = vars(parser.parse_args())
 
 
