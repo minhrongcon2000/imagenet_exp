@@ -55,16 +55,16 @@ fabric.launch()
 
 train_top1_acc = Accuracy(
     num_classes=args.get("num_classes", 1000), top_k=1, task="multiclass"
-)
+).to(args.get("accelerator"))
 train_top5_acc = Accuracy(
     num_classes=args.get("num_classes", 1000), top_k=5, task="multiclass"
-)
+).to(args.get("accelerator"))
 val_top1_acc = Accuracy(
     num_classes=args.get("num_classes", 1000), top_k=1, task="multiclass"
-)
+).to(args.get("accelerator"))
 val_top5_acc = Accuracy(
     num_classes=args.get("num_classes", 1000), top_k=5, task="multiclass"
-)
+).to(args.get("accelerator"))
 
 train_transform = Compose(
     [
