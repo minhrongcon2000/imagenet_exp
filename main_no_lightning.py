@@ -44,10 +44,6 @@ args = vars(parser.parse_args())
 
 L.seed_everything(42)
 
-os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
-
-wandb.init(project="ImageNet1k", name="ImageNet1k_ResNet50")
-
 fabric = L.Fabric(
     accelerator=args.get("accelerator", "cuda"), devices=args.get("num_devices", 1)
 )
@@ -133,6 +129,10 @@ lr_scheduler = StepLR(
 
 train_loader = fabric.setup_dataloaders(train_loader)
 val_loader = fabric.setup_dataloaders(val_loader)
+
+os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
+
+wandb.init(project="ImageNet1k", name="ImageNet1k_ResNet50")
 
 for epoch in range(args.get("num_epochs")):
     print("Training...")
