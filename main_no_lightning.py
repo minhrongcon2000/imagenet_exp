@@ -140,7 +140,7 @@ for epoch in range(args.get("num_epochs")):
     model.train()
     for step, (input, target) in enumerate(train_loader):
         optimizer.zero_grad()
-        output = model(input, target)
+        output = model(input)
 
         loss = cross_entropy(output, target)
         fabric.backward(loss)
@@ -180,7 +180,7 @@ for epoch in range(args.get("num_epochs")):
 
     for step, (input, target) in enumerate(val_loader):
         with torch.no_grad():
-            output = model(input, target)
+            output = model(input)
             loss = cross_entropy(output, target)
 
             avg_val_loss += loss.item()
