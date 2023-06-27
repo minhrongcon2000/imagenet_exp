@@ -149,7 +149,6 @@ for epoch in range(args.get("num_epochs")):
         batch_top5_acc = train_top5_acc(output, target)
 
         optimizer.step()
-        lr_scheduler.step()
 
         if step % args.get("log_every_n_step") == 0:
             print(
@@ -211,6 +210,8 @@ for epoch in range(args.get("num_epochs")):
             val_top5_acc=epoch_val_top5_acc,
         )
     )
+
+    lr_scheduler.step()
 
     train_top1_acc.reset()
     train_top5_acc.reset()
