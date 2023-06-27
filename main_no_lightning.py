@@ -163,6 +163,7 @@ for epoch in range(args.get("num_epochs")):
                     train_loss=loss,
                     train_top1_acc=batch_top1_acc,
                     train_top5_acc=batch_top5_acc,
+                    lr=lr_scheduler.get_lr(),
                 )
             )
 
