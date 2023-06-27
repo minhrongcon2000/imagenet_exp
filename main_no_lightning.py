@@ -156,14 +156,15 @@ for epoch in range(args.get("num_epochs")):
                 f"Step {step}, "
                 + f"train_loss: {loss}, "
                 + f"train_top1_acc: {batch_top1_acc}, "
-                + f"train_top5_acc: {batch_top5_acc}"
+                + f"train_top5_acc: {batch_top5_acc}, "
+                + f"lr: {lr_scheduler.get_last_lr()[0]}"
             )
             wandb.log(
                 dict(
                     train_loss=loss,
                     train_top1_acc=batch_top1_acc,
                     train_top5_acc=batch_top5_acc,
-                    lr=lr_scheduler.get_lr()[0],
+                    lr=lr_scheduler.get_last_lr()[0],
                 )
             )
 
