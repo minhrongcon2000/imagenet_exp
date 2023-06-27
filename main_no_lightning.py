@@ -122,14 +122,14 @@ optimizer = SGD(
     momentum=args.get("momentum", 0.9),
 )
 
+
+model, optimizer = fabric.setup(model, optimizer)
+
 lr_scheduler = StepLR(
     optimizer=optimizer,
     step_size=30,
     gamma=0.1,
 )
-
-model, optimizer = fabric.setup(model, optimizer)
-
 
 train_loader = fabric.setup_dataloaders(train_loader)
 val_loader = fabric.setup_dataloaders(val_loader)
