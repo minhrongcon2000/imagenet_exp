@@ -69,6 +69,5 @@ train_loader = DataLoader(
 
 train_loader = fabric.setup_dataloaders(train_loader)
 
-for epoch in range(args.get("num_epochs")):
-    for step, (input, target) in enumerate(train_loader):
-        print(step)
+for step, (input, target) in enumerate(train_loader):
+    print(step)
