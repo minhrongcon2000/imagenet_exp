@@ -110,7 +110,7 @@ pl_trainer = Trainer(
         ),
         LearningRateMonitor(),
     ],
-    logger=TensorBoardLogger(),
+    logger=TensorBoardLogger(save_dir="logs"),
 )
 
 pl_trainer.fit(
