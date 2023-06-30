@@ -38,8 +38,6 @@ model_group.add_argument("--weight_decay", type=float, default=1e-4)
 model_group.add_argument("--momentum", type=float, default=0.9)
 args = vars(parser.parse_args())
 
-os.environ["WANDB_API_KEY"] = args.get("wandb_api_key")
-
 seed_everything(42)
 
 
