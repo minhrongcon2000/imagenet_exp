@@ -28,7 +28,7 @@ trainer_group = parser.add_argument_group("trainer config")
 trainer_group.add_argument("--batch_size", type=int, default=256)
 trainer_group.add_argument("--num_devices", type=int, default=2)
 trainer_group.add_argument("--device", type=str, default="gpu")
-trainer_group.add_argument("--num_workers", type=int, default=4)
+trainer_group.add_argument("--num_workers", type=int, default=16)
 trainer_group.add_argument("--resume_artifact", type=str)
 trainer_group.add_argument("--num_epochs", type=int, default=90)
 model_group = parser.add_argument_group("model config")
@@ -43,24 +43,24 @@ seed_everything(42)
 
 train_transform = Compose(
     [
-        ToTensor(),
-        RandomResizedCrop(224),
+        RandomResizedCrop(224, antialias=True),
         RandomHorizontalFlip(),
+        ToTensor(),
         Normalize(
-            mean=[0.49139968, 0.48215841, 0.44653091],
-            std=[0.24703223, 0.24348513, 0.26158784],
+            mean=(0.485, 0.456, 0.406),
+            std=(0.229, 0.224, 0.225),
         ),
     ]
 )
 
 test_transform = Compose(
     [
-        ToTensor(),
-        Resize(size=256),
+        Resize(size=256, antialias=True),
         CenterCrop(224),
+        ToTensor(),
         Normalize(
-            mean=[0.49139968, 0.48215841, 0.44653091],
-            std=[0.24703223, 0.24348513, 0.26158784],
+            mean=(0.485, 0.456, 0.406),
+            std=(0.229, 0.224, 0.225),
         ),
     ]
 )
