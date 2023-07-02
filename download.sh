@@ -16,5 +16,5 @@ unzip imagenet1k2.zip -d train
 rm imagenet1k2.zip
 unzip imagenet1k3.zip -d train
 rm imagenet1k3.zip
-unzip imagenet1kvalid.zip -d train
+unzip imagenet1kvalid.zip -d val
 rm imagenet1kvalid.zip
